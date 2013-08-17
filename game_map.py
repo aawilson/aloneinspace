@@ -30,7 +30,7 @@ class Map(object):
         self.room_min_size = room_min_size
         self.max_rooms = max_rooms
 
-        self.tiles = [[Tile(True)
+        self.tiles = [[Tile(False)
                 for y in range(self.height)]
             for x in range(width)]
 
@@ -147,6 +147,7 @@ class Tile(object):
         self,
         blocked,
         block_sight=None,
+        air=False,
     ):
         self.blocked = blocked
         if block_sight is None:
@@ -154,22 +155,69 @@ class Tile(object):
         else:
             self.block_sight = block_sight
         self.explored = False
+        self.air=air
 
 
 def create_room(the_map, room):
+    for x in range(room.x1, room.x2 + 1):
+        for y in range(room.y1, room.y2 + 1):
+            if not the_map[x][y].air:
+                the_map[x][y].blocked = True
+                the_map[x][y].block_sight = True
+
     for x in range(room.x1 + 1, room.x2):
         for y in range(room.y1 + 1, room.y2):
             the_map[x][y].blocked = False
             the_map[x][y].block_sight = False
+            the_map[x][y].air = True
 
 
 def create_h_tunnel(the_map, x1, x2, y):
     for x in range(min(x1, x2), max(x1, x2) + 1):
         the_map[x][y].blocked = False
         the_map[x][y].block_sight = False
+        the_map[x][y].air = True
+
+        if not the_map[x][y - 1].air:
+            the_map[x][y - 1].blocked = True
+            the_map[x][y - 1].block_sight = True
+
+        if not the_map[x][y + 1].air:
+            the_map[x][y + 1].blocked = True
+            the_map[x][y + 1].block_sight = True
+    for y in range(y-1, y + 2):
+        x = min(x1, x2) - 1
+        if not the_map[x][y].air:
+            the_map[x][y].blocked = True
+            the_map[x][y].block_sight = True
+
+        x = max(x1, x2) + 1
+        if not the_map[x][y].air:
+            the_map[x][y].blocked = True
+            the_map[x][y].block_sight = True
 
 
 def create_v_tunnel(the_map, y1, y2, x):
     for y in range(min(y1, y2), max(y1, y2) + 1):
         the_map[x][y].blocked = False
         the_map[x][y].block_sight = False
+        the_map[x][y].air = True
+
+        if not the_map[x + 1][y].air:
+            the_map[x + 1][y].blocked = True
+            the_map[x + 1][y].block_sight = True
+
+        if not the_map[x - 1][y].air:
+            the_map[x - 1][y].blocked = True
+            the_map[x - 1][y].block_sight = True
+
+    for x in range(x-1, x + 2):
+        y = min(y1, y2) - 1
+        if not the_map[x][y].air:
+            the_map[x][y].blocked = True
+            the_map[x][y].block_sight = True
+
+        y = max(y1, y2) + 1
+        if not the_map[x][y].air:
+            the_map[x][y].blocked = True
+            the_map[x][y].block_sight = True

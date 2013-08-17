@@ -17,7 +17,7 @@ def handle_keys():
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
     elif key.vk == libtcod.KEY_ESCAPE:
-        return True, dx, dy
+        return True, dx, dy, fov_recompute
 
     if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_CHAR and key.c in [ord('k'), ord('y'), ord('u')]:
         dy = -1
@@ -128,3 +128,4 @@ if __name__ == "__main__":
 
         if dx or dy:
             player.move(dx, dy)
+            print "Air: %s" % the_map[player.x][player.y].air
