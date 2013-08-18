@@ -1,6 +1,7 @@
+import game_map
+import keymeister
 import libtcodpy as libtcod
 import obj
-import game_map
 import rendermeister
 
 SCREEN_WIDTH = 80
@@ -9,32 +10,6 @@ LIMIT_FPS = 20
 
 MAP_WIDTH = 80
 MAP_HEIGHT = 45
-
-def handle_keys():
-    key = libtcod.console_wait_for_keypress(True)
-    dx, dy = 0, 0
-    fov_recompute = False
-
-    if key.vk == libtcod.KEY_ENTER and key.lalt:
-        libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-    elif key.vk == libtcod.KEY_ESCAPE:
-        return True, dx, dy, fov_recompute
-
-    if key.vk == libtcod.KEY_UP or key.vk == libtcod.KEY_CHAR and key.c in [ord('k'), ord('y'), ord('u')]:
-        dy = -1
-        fov_recompute = True
-    elif key.vk == libtcod.KEY_DOWN or key.vk == libtcod.KEY_CHAR and key.c in [ord('j'), ord('n'), ord('b')]:
-        dy = 1
-        fov_recompute = True
-
-    if key.vk == libtcod.KEY_LEFT or key.vk == libtcod.KEY_CHAR and key.c in [ord('h'), ord('y'), ord('b')]:
-        dx = -1
-        fov_recompute = True
-    elif key.vk == libtcod.KEY_RIGHT or key.vk == libtcod.KEY_CHAR and key.c in [ord('l'), ord('u'), ord('n')]:
-        dx = 1
-        fov_recompute = True
-
-    return False, dx, dy, fov_recompute
 
 
 if __name__ == "__main__":
@@ -51,36 +26,50 @@ if __name__ == "__main__":
         color_bg=libtcod.Color(0, 0, 0),
     )
 
-    start_room = the_map.generate(randlib=libtcod)
+    rooms = the_map.generate(randlib=libtcod)
 
     player = obj.Object(
-        x=start_room.center()[0],
-        y=start_room.center()[1],
+        x=rooms[0].center()[0],
+        y=rooms[0].center()[1],
         char='@',
         color=libtcod.white,
         mapref=the_map,
         torch_radius=10,
     )
 
-    objects = [player]
+    npc = obj.Object(
+        x=rooms[1].center()[0],
+        y=rooms[1].center()[1],
+        char='x',
+        color=libtcod.red,
+        mapref=the_map,
+        torch_radius=1,
+    )
+
+    objects = [player, npc]
 
     renderer = rendermeister.RenderMeister(drawlib=libtcod, fov_map=libtcod.map_new(the_map.width, the_map.height), mapref=the_map, objfocus=player, objrefs=objects)
+    key_handler = keymeister.KeyMeister(keylib=libtcod)
 
     while not libtcod.console_is_window_closed():
-        dx, dy = 0, 0
-
         renderer.render_all()
         libtcod.console_flush()
         renderer.clear_all()
 
-        exit, dx, dy, fov_recompute = handle_keys()
+        key_handler.handle_keys()
 
-        if fov_recompute:
+        if key_handler.fov_recompute:
             renderer.recompute_fov()
 
-        if exit:
+        if key_handler.exit:
             break
 
-        if dx or dy:
-            player.move(dx, dy)
+        if key_handler.dx or key_handler.dy:
+            player.move(key_handler.dx, key_handler.dy)
             print "Air: %s" % the_map[player.x][player.y].air
+
+        if key_handler.switch_focus:
+            if renderer.objfocus == objects[-1]:
+                renderer.objfocus = objects[0]
+            else:
+                renderer.objfocus = objects[objects.index(renderer.objfocus) + 1]

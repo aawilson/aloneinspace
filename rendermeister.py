@@ -27,9 +27,6 @@ class RenderMeister(object):
     def recompute_fov(self):
         self.fov_recompute = True
 
-    def set_focus(self, objfocus):
-        self.objfocus = objfocus
-
     def render_all(self):
 
         self.drawlib.console_set_default_foreground(self.main_console, self.drawlib.white)

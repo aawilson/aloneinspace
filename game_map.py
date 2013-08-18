@@ -35,7 +35,6 @@ class GameMap(object):
 
     def generate(self, randlib):
         rooms = []
-        start_room = None
 
         for r in range(self.max_rooms):
             w = randlib.random_get_int(
@@ -69,9 +68,7 @@ class GameMap(object):
 
             if not failed:
                 create_room(self, new_room)
-                if len(rooms) == 0:
-                    start_room = new_room
-                else:
+                if len(rooms) > 0:
                     (prev_x, prev_y) = rooms[-1].center()
 
                     if randlib.random_get_int(0, 0, 1) == 1:
@@ -83,7 +80,7 @@ class GameMap(object):
 
                 rooms.append(new_room)
 
-        return start_room
+        return rooms
 
 
 class Tile(object):
