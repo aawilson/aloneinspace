@@ -1,11 +1,9 @@
 import poly
 
 
-class Map(object):
+class GameMap(object):
     def __init__(
         self,
-        gamelib,
-        console,
         width,
         height,
         color_dark_wall,
@@ -17,8 +15,6 @@ class Map(object):
         room_min_size=6,
         max_rooms=30,
     ):
-        self._gamelib = gamelib
-        self._console = console
         self.width = width
         self.height = height
         self.color_dark_ground = color_dark_ground
@@ -37,68 +33,27 @@ class Map(object):
     def __getitem__(self, i):
         return self.tiles[i]
 
-    def draw(self, fov_map):
-        for y in range(self.height):
-            for x in range(self.width):
-                visible = self._gamelib.map_is_in_fov(fov_map, x, y)
-                wall = self[x][y].block_sight
-                if self[x][y].explored and not visible:
-                    if wall:
-                        self._gamelib.console_set_char_background(
-                            self._console,
-                            x,
-                            y,
-                            self.color_dark_wall,
-                            self._gamelib.BKGND_SET,
-                        )
-                    else:
-                        self._gamelib.console_set_char_background(
-                            self._console,
-                            x,
-                            y,
-                            self.color_dark_ground,
-                            self._gamelib.BKGND_SET,
-                        )
-                elif visible:
-                    self[x][y].explored = True
-                    if wall:
-                        self._gamelib.console_set_char_background(
-                            self._console,
-                            x,
-                            y,
-                            self.color_light_wall,
-                            self._gamelib.BKGND_SET,
-                        )
-                    else:
-                        self._gamelib.console_set_char_background(
-                            self._console,
-                            x,
-                            y,
-                            self.color_light_ground,
-                            self._gamelib.BKGND_SET,
-                        )
-
-    def generate(self):
+    def generate(self, randlib):
         rooms = []
         start_room = None
 
         for r in range(self.max_rooms):
-            w = self._gamelib.random_get_int(
+            w = randlib.random_get_int(
                 0,
                 self.room_min_size,
                 self.room_max_size,
             )
-            h = self._gamelib.random_get_int(
+            h = randlib.random_get_int(
                 0,
                 self.room_min_size,
                 self.room_max_size,
             )
-            x = self._gamelib.random_get_int(
+            x = randlib.random_get_int(
                 0,
                 0,
                 self.width - w - 1,
             )
-            y = self._gamelib.random_get_int(
+            y = randlib.random_get_int(
                 0,
                 0,
                 self.height - h - 1,
@@ -119,7 +74,7 @@ class Map(object):
                 else:
                     (prev_x, prev_y) = rooms[-1].center()
 
-                    if self._gamelib.random_get_int(0, 0, 1) == 1:
+                    if randlib.random_get_int(0, 0, 1) == 1:
                         create_h_tunnel(self, prev_x, new_x, prev_y)
                         create_v_tunnel(self, prev_y, new_y, new_x)
                     else:
@@ -129,17 +84,6 @@ class Map(object):
                 rooms.append(new_room)
 
         return start_room
-
-    def clear(self):
-        for y in range(self.height):
-            for x in range(self.width):
-                self._gamelib.console_set_char_background(
-                    self._console,
-                    x,
-                    y,
-                    self.color_bg,
-                    self._gamelib.BKGND_SET,
-                )
 
 
 class Tile(object):
