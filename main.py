@@ -1,3 +1,5 @@
+import math
+
 import game_map
 import keymeister
 import libtcodpy as libtcod
@@ -10,6 +12,17 @@ LIMIT_FPS = 20
 
 MAP_WIDTH = 80
 MAP_HEIGHT = 45
+
+POLAR_CARDINALS = [
+        (0, 1),
+        (1, 1),
+        (1, 0),
+        (1, -1),
+        (0, -1),
+        (-1, -1,),
+        (-1, 0),
+        (-1, 1),
+    ]
 
 
 if __name__ == "__main__":
@@ -37,16 +50,17 @@ if __name__ == "__main__":
         torch_radius=10,
     )
 
-    npc = obj.Object(
+    camera = obj.Object(
         x=rooms[1].center()[0],
         y=rooms[1].center()[1],
         char='x',
         color=libtcod.red,
         mapref=the_map,
-        torch_radius=1,
+        torch_radius=3,
+        fov_dir=libtcod.random_get_float(0, 0.0, 2.0 * math.pi)
     )
 
-    objects = [player, npc]
+    objects = [player, camera]
 
     renderer = rendermeister.RenderMeister(drawlib=libtcod, fov_map=libtcod.map_new(the_map.width, the_map.height), mapref=the_map, objfocus=player, objrefs=objects)
     key_handler = keymeister.KeyMeister(keylib=libtcod)
