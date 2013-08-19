@@ -192,8 +192,8 @@ def angle_is_between(angle, start, end, inclusive=True):
 def difference_v(start_tuple, end_tuple):
     return (end_tuple[0] - start_tuple[0], end_tuple[1] - start_tuple[1])
 
-def almost_equal(float1, float2, error_margin=0.00001):
-    return abs(float1 - float2) <= error_margin
+def almost_equal(float1, float2, decimal_places_error_allowed=7):
+    return round(float1 - float2, ndigits=decimal_places_error_allowed) == 0
 
 
 if __name__ == "__main__":
