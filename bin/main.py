@@ -1,10 +1,15 @@
+import os
 import math
+import sys
 
-import game_map
-import keymeister
 import libtcodpy as libtcod
-import obj
-import rendermeister
+
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "lib", "python") )
+
+import aloneinspace.game_map as game_map
+import aloneinspace.keymeister as keymeister
+import aloneinspace.obj as obj
+import aloneinspace.rendermeister as rendermeister
 
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
@@ -25,8 +30,16 @@ POLAR_CARDINALS = [
     ]
 
 
+def data_path(*args):
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "data", *args)
+
+
+def font_path(*args):
+    return data_path('fonts', *args)
+
+
 if __name__ == "__main__":
-    libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    libtcod.console_set_custom_font(font_path('arial10x10.png'), libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
     libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'Alone in Space', False)
 
     the_map = game_map.GameMap(
