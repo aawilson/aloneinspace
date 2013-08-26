@@ -43,6 +43,7 @@ class Inventory(object):
             self.attached_containers = self.attached_containers + list(new_containers)
 
     def attach_container(self, new_container):
+        """convenient alias for add_containers"""
         return self.attach_containers([new_container])
 
 
@@ -56,7 +57,7 @@ class Item(object):
 class Container(Item):
     """
     a container is a special item that can hold other items (including containers)
-    its total bulk is the sum of its native bulk, and the bulk of contained items
+    its total bulk is the sum of its tare bulk and the bulk of contained items
     """
     # getters and setters here because they're overridden later
     @property
