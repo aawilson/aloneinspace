@@ -5,7 +5,7 @@ class KeyMeister(object):
         # TODO: states_handled will be passed in, along with handlers for keys
         self.states_handled = {
             'fov_recompute': bool,
-            'switch_focus': bool,
+            'switch_focus': int,
             'dx': int,
             'dy': int,
             'fullscreen': bool,
@@ -36,9 +36,13 @@ class KeyMeister(object):
             self.dx = 1
             self.fov_recompute = True
 
-        if self.keylib.KEY_CHAR and key.c == ord('s'):
-            self.switch_focus = True
-            self.fov_recompute = True
+        if key.vk == self.keylib.KEY_TAB:
+            if key.shift:
+                self.switch_focus = -1
+                self.fov_recompute = True
+            else:
+                self.switch_focus = 1
+                self.fov_recompute = True
 
         return
 

@@ -11,12 +11,12 @@ import aloneinspace.keymeister as keymeister
 import aloneinspace.obj as obj
 import aloneinspace.rendermeister as rendermeister
 
-SCREEN_WIDTH = 80
-SCREEN_HEIGHT = 50
+SCREEN_WIDTH = 120
+SCREEN_HEIGHT = 100
 LIMIT_FPS = 20
 
 MAP_WIDTH = 80
-MAP_HEIGHT = 45
+MAP_HEIGHT = 80
 
 POLAR_CARDINALS = [
         (0, 1),
@@ -39,7 +39,7 @@ def font_path(*args):
 
 
 if __name__ == "__main__":
-    libtcod.console_set_custom_font(font_path('arial10x10.png'), libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    libtcod.console_set_custom_font(font_path('consolas_unicode_10x10.png'), libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW, 32, 64)
     libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'Alone in Space', False)
 
     the_map = game_map.GameMap(
@@ -63,17 +63,19 @@ if __name__ == "__main__":
         torch_radius=10,
     )
 
-    camera = obj.Object(
-        x=rooms[1].center()[0],
-        y=rooms[1].center()[1],
-        char='x',
-        color=libtcod.red,
-        mapref=the_map,
-        torch_radius=3,
-        fov_dir=libtcod.random_get_float(0, 0.0, 2.0 * math.pi)
-    )
+    cameras = []
+    for room in rooms[1:]:
+        cameras.append(obj.Object(
+                    x=room.center()[0],
+                    y=room.center()[1],
+                    char='x',
+                    color=libtcod.red,
+                    mapref=the_map,
+                    torch_radius=8,
+                    fov_dir=libtcod.random_get_float(0, 0.0, 2.0 * math.pi)
+                ))
 
-    objects = [player, camera]
+    objects = [player] + cameras
 
     renderer = rendermeister.RenderMeister(drawlib=libtcod, fov_map=libtcod.map_new(the_map.width, the_map.height), mapref=the_map, objfocus=player, objrefs=objects)
     key_handler = keymeister.KeyMeister(keylib=libtcod)
@@ -95,8 +97,13 @@ if __name__ == "__main__":
             player.move(key_handler.dx, key_handler.dy)
             print "Air: %s" % the_map[player.x][player.y].air
 
-        if key_handler.switch_focus:
+        if key_handler.switch_focus == 1:
             if renderer.objfocus == objects[-1]:
                 renderer.objfocus = objects[0]
             else:
                 renderer.objfocus = objects[objects.index(renderer.objfocus) + 1]
+        elif key_handler.switch_focus == -1:
+            if renderer.objfocus == objects[0]:
+                renderer.objfocus = objects[-1]
+            else:
+                renderer.objfocus = objects[objects.index(renderer.objfocus) - 1]
