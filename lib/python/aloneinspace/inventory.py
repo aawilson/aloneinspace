@@ -22,6 +22,12 @@ class Inventory(object):
     an inventory typically. it has attachment points, but no inherent capacity.
     TODO: some attachment points might have containers that are inherent to the inventory
     ex: a human might have 2 hand containers with a specified bulk capacity
+    TODO: attachment points should be classified, and might possibly accept items as well as
+    inventories (and possibly the distinction should be erased)--a human might accept a helmet on
+    his head that has an attachment point for specific types of equipment, or migth wear an armored
+    suit that accepts weapons
+    TODO: some items (like armor) might deserve special treatment--they might contribute attachment
+    points with built-in containers
     """
     def __init__(self, container_attachment_points=0, attached_containers=None):
         self.container_attachment_points = container_attachment_points
